@@ -1,0 +1,23 @@
+En Kubernetes, la rotación de nodos (Nodes Rotation) se refiere al proceso de reemplazo de nodos antiguos o desactualizados por nuevos nodos en un clúster. 
+Este procedimiento es crucial para mantener la infraestructura del clúster actualizada y segura, y puede incluir la actualización de la versión del sistema operativo, la actualización del software de Kubernetes, o la aplicación de parches de seguridad.
+
+Pasos típicos en la rotación de nodos:
+Drenar el nodo:
+Se asegura de que el nodo actual no acepte nuevas cargas de trabajo y migra los pods existentes a otros nodos en el clúster. Esto se hace con el comando kubectl drain.
+kubectl drain <node-name> --ignore-daemonsets --delete-local-data
+
+Eliminar el nodo del clúster:
+Una vez drenado, el nodo puede ser eliminado del clúster usando el comando kubectl delete node.
+kubectl delete node <node-name>
+
+Actualizar o reemplazar el nodo:
+Se actualiza o reemplaza el hardware o software del nodo según sea necesario. Esto puede implicar reinstalar el sistema operativo, actualizar el software de Kubernetes, o simplemente agregar un nodo nuevo.
+
+Agregar el nodo actualizado al clúster:
+El nuevo o actualizado nodo se agrega de nuevo al clúster. Esto generalmente se hace siguiendo los pasos de inicialización del nodo en Kubernetes, utilizando kubeadm o el método específico de su entorno de implementación.
+kubeadm join <master-ip>:<master-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+
+Beneficios de la rotación de nodos:
+* Seguridad: Mantener el software actualizado reduce las vulnerabilidades.
+* Rendimiento: Hardware y software más nuevos pueden mejorar el rendimiento del clúster.
+* Confiabilidad: Rotar nodos de manera regular puede prevenir problemas antes de que ocurran debido a fallos en hardware antiguo o software desactualizado.

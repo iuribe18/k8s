@@ -1,0 +1,103 @@
+Pods: Pods are the smallest deployable units in k8s. A Pos is a single instance of an application. A Pod is the smallest object that you can create in k8s. 
+Los Pods son efímeros por naturaleza y son gestionados por controladores más altos como Deployments o ReplicaSets.
+Services are an abstraction that determines which pods to connect to and the policy on how to connect them. Pods have labels on them so that our service can select them in a huge pool of other pods.
+There are 3 types of services in k8s (NodePort, ClusterIP, LoadBalancer)
+ClusterIP: This is an internal only service that is created to enable communication between applications within the cluster. This type of service is only accessible winning the cluster.
+If you'd like to make an application accessible outside of the cluster, then you must create a service of type NodePort.
+This will make the service accessible on a predefined port on all the nodes in the cluster. The third tipe is called LoadBalancer. This type of service is only supported with specific cloud providers. This is like NodePort service, but invokes a supported external LoadBalancer to create a LoadBalancer to the ports the application exposed on the nodes in the clusters.
+That's a quick recap of services.
+
+Deployment
+Deployment: Administra la implementación, actualización y escalado de aplicaciones en contenedores mediante Pods y ReplicaSets.
+Deployment es un objeto en Kubernetes que gestiona la implementación y el estado de las aplicaciones en contenedores. Un Deployment proporciona actualizaciones declarativas a las aplicaciones, lo que significa que puedes describir el estado deseado para tu aplicación y Kubernetes se encargará de hacerlo realidad. 
+Los Deployments son esenciales para mantener la alta disponibilidad y la escalabilidad de las aplicaciones.
+
+Características principales de un Deployment:
+Actualizaciones Declarativas: Puedes actualizar tu aplicación simplemente cambiando la especificación del Deployment y Kubernetes se encargará del resto.
+ReplicaSets: Un Deployment crea y gestiona un ReplicaSet, que asegura que el número correcto de Pods esté en ejecución.
+Rollbacks: Si algo sale mal con una actualización, puedes revertir a una versión anterior.
+Auto-Scaling: Se puede configurar para escalar automáticamente los Pods en función de las métricas definidas (usualmente, CPU y memoria).
+
+Servicio (Service)
+Service: Define una política de acceso a los Pods, proporcionando descubrimiento de servicios y balanceo de carga.
+Service es un objeto en k8s que define una política lógica para acceder a un conjunto de Pods. Los Services permiten la comunicación entre diferentes componentes de la aplicación (como frontend y backend) o la exposición de aplicaciones a través de la red.
+
+Características principales de un Service:
+Discovery y Load Balancing: Un Service proporciona un punto de entrada estable para acceder a los Pods, distribuyendo el tráfico de manera equilibrada.
+Tipos de Servicios:
+ClusterIP: Exposición interna dentro del clúster.
+NodePort: Exposición en un puerto específico de cada nodo.
+LoadBalancer: Creación de un balanceador de carga externo.
+ExternalName: Mapeo a un nombre DNS externo.
+
+Namespace
+Un Namespace es una forma de dividir un clúster en múltiples entornos virtuales. Los Namespaces son útiles para organizar y gestionar recursos de forma aislada dentro de un mismo clúster, especialmente en entornos de producción donde se gestionan múltiples proyectos o equipos. Cada Namespace tiene su propio espacio de nombres y puede contener recursos como Pods, Services, ConfigMaps, y otros objetos de Kubernetes.
+
+**ResourceQuota**
+ResourceQuota es una herramienta que permite imponer límites en el uso de recursos dentro de un Namespace específico. Esto ayuda a asegurar que los recursos del clúster (como CPU, memoria, y almacenamiento) se distribuyan de manera equitativa y que ningún equipo o aplicación consuma más de lo asignado, evitando así el monopolio de los recursos y garantizando la estabilidad del clúster.
+
+Características principales de ResourceQuota
+Límites de Recursos:
+Puedes definir límites máximos en el uso de CPU, memoria, y almacenamiento. Por ejemplo, puedes especificar la cantidad total de CPU y memoria que se puede utilizar en un Namespace.
+
+Control de Objetos:
+ResourceQuota también puede limitar el número de objetos que se pueden crear en un Namespace, como Pods, Services, PersistentVolumeClaims, y otros.
+
+Aseguramiento de Calidad de Servicio:
+Ayuda a mantener una calidad de servicio consistente al evitar que aplicaciones individuales consuman todos los recursos del clúster.
+
+**Taints**
+Taints and tolerations are used to set restrictions on what pods can be scheduled on a node.
+So remember, taints and tolerations does not tell the pod to go to a particular node. Instead, it tells the node to only accept pods with certain tolerations.
+Son mecanismos que permiten controlar cómo se asignan los pods a los nodos. Proporcionan una forma de evitar que algunos pods se programen en ciertos nodos, o permitir que ciertos pods se asignen a nodos que otros pods evitan.
+
+Taints (Contaminaciones)
+Las taints se aplican a los nodos y permiten repeler pods no deseados. 
+Un taint tiene tres componentes:
+Clave (key): Una etiqueta identificadora.
+Valor (value): Un valor asociado a la clave.
+Efecto (effect): Una de tres posibles acciones:
+"NoSchedule": No se permitirá la programación de nuevos pods en el nodo, pero los pods ya existentes no se eliminarán.
+"PreferNoSchedule": Kubernetes evitará programar nuevos pods en el nodo, pero no lo impedirá de manera absoluta.
+"NoExecute": No se permitirá la programación de nuevos pods y se eliminarán los pods existentes en el nodo.
+# kubectl taint nodes NODE-NAME key=value:taint-effect
+$ kubectl taint nodes node1 app=blue:NoSchedule
+
+**Tolerations**
+Las tolerations se aplican a los pods y permiten que estos se programen en nodos con ciertas taints. Una toleration tiene los siguientes componentes:
+Clave (key): La clave de la taint que tolera.
+Operador (operator): Puede ser Equal o Exists. Equal compara el valor, mientras que Exists solo verifica la existencia de la clave.
+Valor (value): El valor asociado a la clave (solo necesario si el operador es Equal).
+Efecto (effect): Debe coincidir con el efecto de la taint.
+TolerationSeconds: Opcional. Especifica cuánto tiempo puede tolerar el pod una taint de efecto NoExecute antes de ser eliminado.
+
+**Node Affinity**
+The primary purpose of node affinity feature is to ensure that pods are hosted on particular nodes.
+Node Affinity Tipes:
+requiredDuringSchedulingIgnoredDuringExecution: Este tipo actúa como un filtro. Los pods sólo serán colocados en nodos que cumplan con las reglas especificadas. Si un nodo no cumple con la regla, el pod no será programado allí.
+preferredDuringSchedulingIgnoredDuringExecution: Este tipo permite especificar preferencias. El scheduler intentará, en la medida de lo posible, colocar los pods en nodos que cumplan con las reglas definidas, pero no es obligatorio. Si no es posible cumplir con la preferencia, el pod aún puede ser programado en un nodo que no cumpla con las especificaciones.
+
+**DaemonSet**
+The DaemonSet ensures that one copy of the pod is always present in all nodes in the cluster.
+And when a node is removed the pod is automatically removed.
+Cases: monitoring, logs, kube-proxy, networking
+
+**Static Pods**
+The kubelet can manage a Node independently.
+Place the Pod definition files in this directory (/etc/k8s/manifest)
+So these pods that are created by the kubelet on its own without the intervention from the API server or rest of the Kubernetes cluster components are known as static pods.
+
+kubelet.service
+--pod-manifest-path=/etc/k8s/manifests
+--config=kubeconfig.yaml
+kubeconfig.yaml
+staticPodPath: /etc/k8s/manifest
+En resumen, los Static Pods son útiles para asegurar la disponibilidad de pods críticos y para configuraciones iniciales del clúster, especialmente cuando se necesita garantizar que ciertos componentes se ejecuten independientemente del estado del API server.
+
+**Priority Class**
+Shceduling Plugins
+Schedulig queue - PrioritySort
+Filtering - NodeResourcesFit, NodeName, NodeUnschedulable
+Scoring - NodeResourcesFit, ImageLocality
+Binding - DefaultBinder
+ExtensionPoints

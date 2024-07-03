@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Id": "Policy1481845669738",
+    "Statement": [
+        {
+            "Sid": "Stmt1481845646252",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::735948513526:root"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::ea-test-bucket-cross-account/*"
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+# YAML in k8s
+apiVersion: v1
+# This is the version of the k8s API we are using to create the object
+kind: Pod
+# The kind refers to the type of object we are trying to create
+metadata:
+# The metadata is data above the object like its name, labels, etcetera. Metadata is a dictionary.
+  name: my-pod
+  labels:
+    app: my-app
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx:latest
+# Spec is a dictionary so add a property under it called containers. Containers is a list or an array. The reason is because the pods can have multiple containers within them.

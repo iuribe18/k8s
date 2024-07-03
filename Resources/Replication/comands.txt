@@ -1,0 +1,32 @@
+ReplicaSet y ReplicationController son recursos en k8s utilizados para garantizar la disponibilidad de un número específico de réplicas de pods. 
+ReplicaSet es la evolución de ReplicationController y es parte de la API apps/v1, lo que significa que tiene características más avanzadas y mejor soporte.
+ReplicaSet es utilizado por el objeto Deployment para gestionar el ciclo de vida de los pods, proporcionando capacidades de actualización y rollback.
+En resumen, ReplicaSet es una versión más avanzada y flexible de ReplicationController, diseñada para trabajar mejor con otras características modernas de Kubernetes, como los Deployments.
+ReplicaSet requires a selector definition.
+
+# ReplicaSet (Scale)
+# Hay un replicaset en ejecución con 3 replicas y deseamos aumentar o reducir el número de replicas
+1. Actualizar el número de replicas en el yaml y ejecutar el comando replace
+$ k replace -f replicaset.yaml 
+2. Usando el comando scale y parámetro replicas
+# k scale --replicas=NUMBER_OF_REPLICAS -f rs-definition.yaml 
+$ k scale --replicas=6 -f replicaset.yaml
+3. Usando el comando scale, TYPE y NAME
+# k scale --replicas=6 TYPE NAME_REPLICASET
+$ k scale --replicas=6 replicaset name_replicaset
+
+$ k create -f ReplicaSet.yaml
+$ k apply -f ReplicaSet.yaml
+$ k get replicaset
+$ k get rs
+$ k delete replicaset NAME_REPLICASET
+$ k edit replicaset NAME_REPLICASET
+kubectl describe replicaset
+# You can check for apiVersion of ReplicaSet
+kubectl api-resources | grep replicaset
+
+#Editar una replica en ejecución
+# k edit rs NAME
+$ k edit rs new-replica-set
+
+# kubectl delete pods -l app=new-replica-set

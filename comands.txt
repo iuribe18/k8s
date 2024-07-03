@@ -1,0 +1,39 @@
+# Nodes
+# Label Nodes
+# kubectl label nodes NODE_NAME label-key=label-value
+$ kubectl label nodes node01 size=large
+
+# PODS
+# Use kubectl run command with --dry-run=client -o yaml option to create a manifest file
+$ kubectl run redis --image=redis --dry-run=client -o yaml > redis-definition.yaml
+$ kubectl run redis --image=redis -n finance (namespace)
+
+# To view pods in all namespaces
+$ k get pods --all-namespaces
+
+# ReplicaSet (Scale)
+1. Hay un replicaset en ejeucicón y deseamos aumentar o reducir el número de replicas
+$ k replace -f replicaset.yaml 
+$ k scale --replicas=6 -f replicaset.yaml
+# k scale --replicas=6 replicaset NAME_REPLICASET
+$ k scale --replicas=6 replicaset name_replicaset
+
+## Namespace
+# Set up a namespace
+$ k config set-context $(k config current-context) --namespace=dev
+# To limit resources in a namespace, create a resource quota.
+## ResorceQuota
+# Verificar el estado de ResourceQuota
+$ k get resourcequota -n my-namespace
+
+## Taint
+$ k describe nodes controlplane | grep Taints
+output:
+Taints: node-role.kubernetes.io/control-plane:NoSchedule
+$ kubectl taint nodes controlplane node-role.kubernetes.io/control-plane:NoSchedule-
+output: node/controlplane untainted
+$ k describe nodes controlplane | grep Taints
+Taints: <none>
+
+## Deployments
+kubectl create deployment blue --image=nginx --replicas=3

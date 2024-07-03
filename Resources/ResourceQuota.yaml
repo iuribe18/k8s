@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: quota
+  namespace: your-namespace
+spec:
+  hard:
+    requests.cpu: "1"
+    requests.memory: 2Gi
+    limits.cpu: "2"
+    limits.memory: 4Gi
+    pods: "10"
+    services: "5"
+    replicationcontrollers: "5"
+    resourcequotas: "1"
+    configmaps: "10"
+    persistentvolumeclaims: "4"

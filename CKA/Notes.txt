@@ -1,0 +1,103 @@
+POD: Is a single instance of an application. Apod is the smallest object that you can create in k8s.
+kubectl run nginx --image nginx 
+
+CNI (Cluster Network Interface)
+CSI (Container Storage Interface)
+
+Live object configuration:
+So when you run the apply command, if the object doesn't already exist the object is created. When the object is created, an object configuration similar to what we created locally is created within kubernetes but with additional fields to store status of the object.
+This is the live configuration of the object on the kubernetes cluster. This is how kubernetes internally stores information about an object, no matter what approach you use to create the object.
+The YAML version of the local object configuration file we wrote is converted to a JSON format, and it is then stored at the last applied configuration.
+
+Resumen
+Labels son pares clave-valor utilizados para categorizar objetos en Kubernetes.
+Selectors son mecanismos para seleccionar objetos en función de sus etiquetas.
+Selectores de igualdad utilizan una correspondencia exacta de clave-valor.
+selector:
+    app: myapp
+    environment: production
+Selectores de conjuntos permiten seleccionar en función de operadores como In, NotIn, Exists, y DoesNotExist.
+selector:
+    matchLabels:
+      app: myapp
+    matchExpressions:
+    - { key: environment, operator: In, values: [development, production] }
+Annotations are used to record other details for information purpose, for example, tool details like name, version,  build information, that may be used for some kind of integration purpose.
+
+Imperative: using comands
+k run --image=nginx nginx
+k create deployment --image=nginx nginx
+k expose deployment nginx --port 80
+k edit deployment nginx
+k scale deployment nginx --replicas=3
+k set image deployment nginx nginx=nginx:1.18
+Declarative: 
+Certification Tips - Imperative Commands with Kubectl
+While you would be working mostly the declarative way - using definition files, imperative commands can help in getting one time tasks done quickly, as well as generate a definition template easily. 
+This would help save considerable amount of time during your exams.
+Before we begin, familiarize with the two options that can come in handy while working with the below commands:
+--dry-run: By default as soon as the command is run, the resource will be created. If you simply want to test your command , use the --dry-run=client option. This will not create the resource, instead, tell you whether the resource can be created and if your command is right.
+-o yaml: This will output the resource definition in YAML format on screen.
+
+Use the above two in combination to generate a resource definition file quickly, that you can then modify and create resources as required, instead of creating the files from scratch.
+
+## POD
+# Create an NGINX Pod
+# kubectl run POD_NAME --image=IMAGE
+$ kubectl run nginx --image=nginx
+# Adicionando labels
+$ kubectl run redis --image=redis:alpine --labels=tier=db
+
+# Create a pod called custom-nginx using the nginx image and run it on container port 8080
+$ kubectl run custom-nginx --image=nginx --port=8080
+
+# Exponer el pod creado usando un service
+kubectl expose pod redis --port=6379 --name redis-service
+
+# Create a pod called httpd using the image httpd:alpine. Next, create a service of type ClusterIP by the same name (httpd). The target port for the service should be 80.
+kubectl run httpd --image=httpd:alpine --port=80 --expose
+# output:
+service/httpd created
+pod/httpd created
+
+# Generate POD Manifest YAML file (-o yaml). Don't create it(--dry-run)
+$ kubectl run nginx --image=nginx --dry-run=client -o yaml
+
+## Selectors
+$ kubectl get pods --selector env=dev
+# How many objects are in the prod environment including PODs, ReplicaSets and any other objects?
+$ kubectl get all -o wide --selector env=prod
+# Identify the POD which is part of the prod environment, the finance BU and of frontend tier?
+$ kubectl get pods --selector env=prod,bu=finance,tier=frontend
+
+## Deployment
+# Create a deployment
+$ kubectl create deployment --image=nginx nginx
+
+# Generate Deployment YAML file (-o yaml). Don't create it(--dry-run)
+$ kubectl create deployment --image=nginx nginx --dry-run=client -o yaml
+
+# Generate Deployment with 4 Replicas
+$ kubectl create deployment nginx --image=nginx --replicas=4
+
+You can also scale a deployment using the kubectl scale command.
+$ kubectl scale deployment nginx --replicas=4
+
+Another way to do this is to save the YAML definition to a file and modify
+$ kubectl create deployment nginx --image=nginx --dry-run=client -o yaml > nginx-deployment.yaml
+
+You can then update the YAML file with the replicas or any other field before creating the deployment.
+
+## Service
+Create a Service named redis-service of type ClusterIP to expose pod redis on port 6379
+$ kubectl expose pod redis --port=6379 --name redis-service --dry-run=client -o yaml
+(This will automatically use the pod's labels as selectors)
+$ kubectl create service clusterip redis --tcp=6379:6379 --dry-run=client -o yaml 
+(This will not use the pods labels as selectors, instead it will assume selectors as app=redis. You cannot pass in selectors as an option. So it does not work very well if your pod has a different label set. So generate the file and modify the selectors before creating the service)
+
+# Create a Service named nginx of type NodePort to expose pod nginx's port 80 on port 30080 on the nodes:
+$ kubectl expose pod nginx --type=NodePort --port=80 --name=nginx-service --dry-run=client -o yaml
+(This will automatically use the pod's labels as selectors, but you cannot specify the node port. You have to generate a definition file and then add the node port in manually before creating the service with the pod.)
+$ kubectl create service nodeport nginx --tcp=80:80 --node-port=30080 --dry-run=client -o yaml
+(This will not use the pods labels as selectors)
+Both the above commands have their own challenges. While one of it cannot accept a selector the other cannot accept a node port. I would recommend going with the kubectl expose command. If you need to specify a node port, generate a definition file using the same command and manually input the nodeport before creating the service.

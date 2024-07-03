@@ -1,0 +1,5 @@
+All of these follow similar structure k8s definition file always contanins 4 top level fields.
+apiVersion, kind, metadata, spec.
+
+Replication Controllers and ReplicaSets
+The replication controller helps us run mutiple instances of a single pod in the k8s cluster, thus providing high availability.

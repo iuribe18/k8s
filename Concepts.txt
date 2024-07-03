@@ -1,0 +1,71 @@
+1. Componentes de un Cluster de Kubernetes:
+* Nodos: Son las máquinas (físicas o virtuales) donde se ejecutan las aplicaciones contenedorizadas. Hay dos tipos de nodos: el Nodo Maestro (Master Node) y los Nodos de Trabajo (Worker Nodes).
+* Nodo Maestro (Master Node): Controla y gestiona el cluster de Kubernetes. Se encarga de tomar decisiones globales sobre el cluster (por ejemplo, programación de aplicaciones) y de detectar y responder a eventos del cluster. 
+El Nodo Maestro incluye los siguientes componentes:
+    - kube-apiserver: El servidor API actúa como la puerta de entrada al cluster de Kubernetes, permitiendo la interacción interna y externa con el cluster.
+    - etcd: Almacén de datos clave-valor que guarda toda la información del cluster, actuando como la fuente de verdad de Kubernetes.
+    - kube-scheduler: Se encarga de programar contenedores en los nodos según recursos disponibles y otros factores.
+    - kube-controller-manager: Ejecuta los controladores, que son procesos de fondo que gestionan el estado del cluster, como asegurar que el número deseado de réplicas de una aplicación esté corriendo.
+* Nodos de Trabajo (Worker Nodes): Son los responsables de ejecutar las aplicaciones contenedorizadas. Cada nodo de trabajo tiene varios componentes:
+    - kubelet: Un agente que se ejecuta en cada nodo de trabajo, asegurando que los contenedores estén corriendo en un Pod.
+    - kube-proxy: Mantiene las reglas de red en los nodos, permitiendo la comunicación a los Pods desde dentro o fuera del cluster.
+    - Contenedor Runtime: El entorno de ejecución de contenedores (como Docker, containerd) que se encarga de ejecutar los contenedores propiamente.
+    
+2. Conceptos Principales:
+Pod: La unidad más pequeña que puede ser desplegada y gestionada por Kubernetes. Un Pod representa un conjunto de contenedores que se ejecutan juntos en el mismo contexto (comparten la misma dirección IP, puerto, volumen de almacenamiento, etc.).
+Servicio (Service): Una abstracción que define un conjunto lógico de Pods y una política por la cual acceder a ellos. Los servicios permiten la comunicación entre diferentes pods o con el mundo exterior.
+Volumen: Proporciona un sistema de almacenamiento para los contenedores dentro de un Pod, permitiendo que los datos persistan más allá del ciclo de vida de los contenedores individuales.
+Namespace: Permite dividir los recursos del cluster entre múltiples usuarios mediante la creación de múltiples "espacios de nombres".
+Deployment: Facilita la declaración de actualizaciones para los Pods y los ReplicaSets. Específicamente útil para desplegar aplicaciones stateless.
+StatefulSet: Especialmente diseñado para aplicaciones stateful, gestiona el despliegue y escalado de un conjunto de Pods, y garantiza el orden y unicidad de estos.
+Ingress: Proporciona reglas de enrutamiento HTTP(S) hacia servicios dentro del cluster, exponiendo servicios al mundo exterior.
+
+**k8s Architecture**
+Nodes: A node is a machine, physical or virtual on which k8s is installed. A node is a worker machine and that is where containers will be launched ky k8s.
+Cluster: A cluster is a set of nodes grouped together. This way even if one node fails you have your app still accessible from the other nodes. Moreover having multiple nodes helps in sharing load as well.
+The master is another node with k8s installed in it and is configured as a Master. The master watches over the nodes in the cluster and is responsible for the actual orchestration of containers on the worker nodes.
+
+Components: An API server and etcd service, a kubelet service, a container runtime, controllers and schedulers.
+API Server: Acts as the front end for k8s. The users, management devices, command line interfaces, all talk to the API server to interact with k8s cluster.
+etcd key store: ectd is a distributed reliable key value store used by k8s to store all data used to manage the cluster.
+Scheduler: is responsible for distributing work or containers across multiple nodes. It looks for newly created containers and assigns them to nodes.
+Control Manager: is the brain behind orchestration. They are responsible for noticing and responding with nodes, containers or endpoints goes down. 
+The controllers make decisions to bring up new containers in such cases.
+
+Container Runtime: is the underlying software that is used to run containers. In our case it happens to be Docker. But there are other options as well.
+Kubelet: is the agent that runs on each node in the cluster. Kubelet is responsible for making sure that the containers are running on the nodes as expected.
+ 
+Pods: Pods are the smallest deployable units in k8s. A Pos is a single instance of an application. A Pod is the smallest object that you can create in k8s. 
+Los Pods son efímeros por naturaleza y son gestionados por controladores más altos como Deployments o ReplicaSets.
+Services are an abstraction that determines which pods to connect to and the policy on how to connect them. Pods have labels on them so that our service can select them in a huge pool of other pods.
+There are 3 types of services in k8s (NodePort, ClusterIP, LoadBalancer)
+ClusterIP: This is an internal only service that is created to enable communication between applications within the cluster. This type of service is only accessible winning the cluster.
+If you'd like to make an application accessible outside of the cluster, then you must create a service of type NodePort.
+This will make the service accessible on a predefined port on all the nodes in the cluster. The third tipe is called LoadBalancer. This type of service is only supported with specific cloud providers. This is like NodePort service, but invokes a supported external LoadBalancer to create a LoadBalancer to the ports the application exposed on the nodes in the clusters.
+That's a quick recap of services.
+
+El ReplicationController es una de las características primitivas proporcionadas por Kubernetes (k8s) para manejar la replicación y el escalado de un conjunto de Pods. 
+Aunque su uso ha sido en gran medida reemplazado por Deployments, que ofrecen más características y flexibilidad, entender el ReplicationController aún puede ser útil para comprender los fundamentos de Kubernetes.
+ReplicationController:
+1. Asegura la replicación: El principal objetivo de un ReplicationController es mantener un número específico de réplicas de un Pod ejecutándose en todo momento. Si un Pod falla, muere o es eliminado, el ReplicationController se encarga de reemplazarlo para asegurar que el número de réplicas se mantenga según lo definido. Esto ayuda a lograr la alta disponibilidad de las aplicaciones.
+2. Facilita el escalado: Permite el escalado manual o automático del número de Pods. Puedes aumentar o disminuir el número de réplicas fácilmente, lo cual es útil para manejar variaciones en la carga de trabajo.
+3. Balanceo de carga: Aunque el ReplicationController en sí mismo no realiza el balanceo de carga, al mantener múltiples réplicas de un Pod, facilita el balanceo de carga entre esas réplicas cuando se usa junto con un servicio de Kubernetes.
+4. Soporte para despliegues y rollback: Aunque los Deployments ofrecen un mecanismo más robusto para actualizar y revertir versiones de aplicaciones, el ReplicationController puede ser utilizado para estos fines de una manera más manual y básica, gestionando las versiones de los Pods que mantiene.
+Es importante destacar que, aunque el ReplicationController sigue siendo soportado por Kubernetes, la práctica recomendada actual es usar Deployments para la mayoría de las necesidades de gestión de aplicaciones. Los Deployments ofrecen todas las capacidades de un ReplicationController, además de la gestión de versiones y rollback, estrategias de despliegue más sofisticadas como los despliegues progresivos (rolling updates), y más.
+
+Envoy is a proxy and communication bus with advanced capabilities. It works as a sidecar next to your containers, just as we described in the last slide, so that the traffic going in and out of our pot is using Envoy as a proxy. Many service mesh implementations use Envoy now.
+Now, the user reaches out to the proxy and the proxy forwards the request to the application. Envoy is an open-source proxy designed for modern service-oriented architectures. It was mainly started in the company Lyft in 2015 when they were trying to solve their own microservices problems.
+
+Sidecards: In the k8s world, we know containers are encapsulated into pods. Each pod can have one or more containers. The additional containers that support the main container are called sidecars or sidecar container.
+They share the same volume and network but they have different responsibilities.
+
+Service: es una abstracción que define un conjunto lógico de Pods y una política para acceder a ellos. Los servicios permiten la comunicación entre diferentes componentes dentro de un cluster de k8s o desde el exterior hacia el cluster. 
+Su principal uso es proporcionar una dirección IP fija y un nombre DNS a un conjunto de Pods, lo que facilita la localización y el acceso a estos, independientemente de los cambios en los Pods subyacentes. Esto es crucial para mantener la continuidad y la fiabilidad de la comunicación en un entorno donde los Pods pueden ser efímeros y frecuentemente reemplazados o escalados.
+Política en el contexto de un Service, se refiere a las reglas que definen cómo se puede acceder a los Pods a través de ese Service. Esto incluye la configuración de puertos, que es fundamental. 
+Por ejemplo, un Service define en qué puerto (o puertos) está escuchando y cómo ese puerto se redirige a los puertos de los Pods subyacentes. La política también puede incluir aspectos como el balanceo de carga y la forma en que el tráfico es dirigido a los diferentes Pods.
+Sidecards: es un patrón de diseño donde un contenedor secundario se ejecuta junto a un contenedor principal dentro del mismo Pod. Los sidecars extienden y mejoran las capacidades del contenedor principal sin cambiarlo. 
+Son útiles para manejar aspectos de la infraestructura y mantener separadas las preocupaciones funcionales.
+Ejemplos:
+* Logging Sidecar: Un contenedor de sidecar puede recoger logs del contenedor principal y enviarlos a un sistema de monitoreo o almacenamiento. 
+Esto es útil cuando la aplicación principal no tiene capacidad nativa para un manejo avanzado de logs.
+* Proxy Sidecar: Un contenedor de sidecar como Envoy puede ser utilizado para manejar el tráfico de red entrante y saliente del contenedor principal, agregando funcionalidades como balanceo de carga, circuit breaking, y autenticación.

@@ -1,0 +1,41 @@
+**k8s Architecture**
+Nodes: A node is a machine, physical or virtual on which k8s is installed. A node is a worker machine and that is where containers will be launched ky k8s.
+Cluster: A cluster is a set of nodes grouped together. This way even if one node fails you have your app still accessible from the other nodes. Moreover having multiple nodes helps in sharing load as well.
+The master is another node with k8s installed in it and is configured as a Master. The master watches over the nodes in the cluster and is responsible for the actual orchestration of containers on the worker nodes.
+
+Components: An API server and etcd service, a kubelet service, a container runtime, controllers and schedulers.
+Master Node
+**kube-apiserver**: primary management component in k8s. Acts as the front end for k8s. The users, management devices, command line interfaces, all talk to the API server to interact with k8s cluster.
+The kube-api server first aunthecticates the request and validates it. It then retieves the data from the ETCD cluster and responds back with the requested information.
+1. Authenticate user
+2. Validate request
+3. Retrieve data
+4. Update ETCD
+5. Scheduler
+6. Kubelet
+
+**etcd key store**: ectd is a distributed reliable key-value store used by k8s to store all data used to manage the cluster. 
+Port 2379
+etcdctl --version
+ETCD datastore stores information regarding the cluster such as the nodes, pods, configs, secrets, accounts, roles, bindings and others.
+Every information you see when you run the kubectl get command is from the ETCD server.
+Every chenge you make to your cluster, such as adding additional nodes, deploying pods or replica sets are updated in the ETCD server. 
+
+**Scheduler**: is responsible for distributing work or containers across multiple nodes. It looks for newly created containers and assigns them to nodes.
+Only is responsible for deciding which pod goes on which node.
+Topics to look at such as resource requirements, limits, taints and toletarions, node selectors, affinity rules, etcetera.
+
+**Kube Control Manager**: is the brain behind orchestration. They are responsible for noticing and responding with nodes, containers or endpoints goes down. 
+A controller is a process that continuously monitors the state of various componenets witihin the system and works towards bringing the whole system to the desired functioning state.
+The node controller is responsible for monitoring the status of the nodes and taking necessary actions to keep the app running.
+It does that through the kube-api server. The node controller checks the status of the nodes every 5 seconds.
+The controllers make decisions to bring up new containers in such cases.
+
+Worker Node
+**Container Runtime**: is the underlying software that is used to run containers. In our case it happens to be Docker. But there are other options as well.
+**Kubelet**: is the agent that runs on each node in the cluster. Kubelet is responsible for making sure that the containers are running on the nodes as expected.
+**Kube proxy**: Within a k8s cluster, every pod can reach every other pod. This is accomplished by deploying a pod networking solution to the cluster.
+A pod network is an internal virtual network that spans across all the nodes in the cluster to which all the pods connect to. Through this network they are able to communicate with each other.
+kube-proxy is a process that runs on each node in the kubernetes cluster.
+Its job is to look for new services, and every time a new service is created, it creates the appropriate rules on each node to forward traffic to those services to the backend pods.
+The kubeadm tool deploys kube-proxy as pods on each node. In fact, it is deployed as a DemonSet, so a single pod is always deployed on each node in the cluster.

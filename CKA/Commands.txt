@@ -1,0 +1,54 @@
+ETCD
+--cacert /etc/kubernetes/pki/etcd/ca.crt
+--cert /etc/kubernetes/pki/etcd/server.crt
+--key /etc/kubernetes/pki/etcd/server.key
+
+kubectl exec etcd-controlplane -n kube-system -- sh -c "ETCDCTL_API=3 etcdctl get / --prefix --keys-only --limit=10 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key"
+
+# api-server options
+cat /etc/systemd/system/kube-apiserver.service
+ps -aux | grep kube-apiserver
+
+# kube-controller options
+cat /etc/k8s/manifests/kube-controller-manager.yaml
+cat /etc/systemd/system/kube-controller.service
+ps -aux | grep kube-controller-manager
+
+# scheduler options
+cat /etc/k8s/manifests/kube-scheduler.yaml
+cat /etc/systemd/system/kube-controller.service
+ps -aux | grep kube-scheduler
+
+# kubelet options
+ps -aux | grep kubelet
+
+# Validar estado del scheduler
+$ kubectl get pods --namespace kube-system
+
+# Taint Node Master
+k describe node kubemaster | grep taint
+
+## Static PODs
+What is the path of the directory holding the static pod definition files?
+$ ps -aux | grep /usr/bin/kubelet
+output:
+root        4289  0.0  0.0 4433428 100572 ?      Ssl  16:01   0:25 /usr/bin/kubelet --bootstrap-kubeconfig=/etc/kubernetes/bootstrap-kubelet.conf 
+--kubeconfig=/etc/kubernetes/kubelet.conf --config=/var/lib/kubelet/config.yaml --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9
+From the output we can see that the kubelet config file used is /var/lib/kubelet/config.yaml
+$ grep -i staticpod /var/lib/kubelet/config.yaml
+output: staticPodPath: /etc/kubernetes/manifests
+ls /etc/kubernetes/manifests | wc -l
+
+Create a static pod named static-busybox that uses the busybox image and the command sleep 1000
+kubectl run --restart=Never --image=busybox static-busybox --dry-run=client -o yaml --command -- sleep 1000 > /etc/kubernetes/manifests/static-busybox.yaml
+
+We just created a new static pod named static-greenbox. Find it and delete it.
+1. First, let's identify the node in which the pod called static-greenbox is created. To do this, run:
+$ kubectl get pods --all-namespaces -o wide  | grep static-greenbox
+
+2. Next, SSH to node01 and identify the path configured for static pods in this node.
+$ ssh node01
+$ ps -ef | grep /usr/bin/kubelet
+output: --kubeconfig=/etc/kubernetes/kubelet.conf --config=/var/lib/kubelet/config.yaml
+$ grep -i staticpod /var/lib/kubelet/config.yaml
+staticPodPath: /etc/just-to-mess-with-you

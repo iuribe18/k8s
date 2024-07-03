@@ -1,0 +1,11 @@
+# Requerimientos
+0. Paquetes
+sudo apt install -y tmux jq wget 
+1. Docker
+./docker.sh
+
+2. kubectl
+./kubectl.sh
+
+3. Minikube
+

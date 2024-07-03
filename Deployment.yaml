@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aws-cli-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aws-cli
+  template:
+    metadata:
+      labels:
+        app: aws-cli
+    spec:
+      serviceAccountName: ups-api
+      containers:
+      - name: aws-cli
+        image: amazon/aws-cli
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do sleep 30; done;"]
+        resources:
+            limits:
+              memory: 1000mGi
+              cpu: 1000m

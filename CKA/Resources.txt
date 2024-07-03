@@ -1,0 +1,27 @@
+Exploring the Kubernetes Architecture: A Foundation for Modern Application Deployment
+https://medium.com/@kavishkafernando/exploring-the-kubernetes-architecture-a-foundation-for-modern-application-deployment-f2c0f15d661e
+
+Cluster Architecture
+https://kubernetes.io/docs/concepts/architecture/
+
+The State of Kubernetes Open Standards: What You Need to Know
+https://medium.com/@seifeddinerajhi/the-state-of-kubernetes-open-standards-what-you-need-to-know-68eff64f6119
+
+GETTING STARTED
+https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands
+
+kubectl Usage Conventions
+https://kubernetes.io/docs/reference/kubectl/conventions/
+
+Configure Multiple Schedulers
+https://kubernetes.io/docs/tasks/extend-kubernetes/configure-multiple-schedulers/
+
+Scheduler code hierarchy overview
+https://github.com/kubernetes/community/blob/master/contributors/devel/sig-scheduling/scheduling_code_hierarchy_overview.md
+
+Advanced Scheduling in Kubernetes
+https://kubernetes.io/blog/2017/03/advanced-scheduling-in-kubernetes/
+
+How does the Kubernetes scheduler work?
+https://jvns.ca/blog/2017/07/27/how-does-the-kubernetes-scheduler-work/
+https://stackoverflow.com/questions/28857993/how-does-kubernetes-scheduler-work

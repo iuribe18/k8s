@@ -1,0 +1,29 @@
+When you first create a deployment, it triggers a rollout.
+A new rollout creates a new deployment revision.
+In the future, when the application is upgraded, meaning when the container version is updated to a new one, a new rollout is triggered and a new deployment revision is created.
+This helps us keep track of the changes made to our deployment, and enables us to roll back to a previous version of deployment if necessary.
+You can see the status of your rollout by running the command: "kubectl rollout status" followed by the name of the deployment. To see the revisions and history of rollout, run the command "kubectl rollout history" followed by the deployment name, and this will show you the revisions and history of our deployment.
+
+# Deployment Status
+$ kubectl rollout status DEPLOYMENT_NAME
+
+# Deployment Revisions and History
+$ kubectl rollout history DEPLOYMENT_NAME
+
+There are two types of deployment strategies.
+- Recreate Strategy (destroy all the pods at the same time). During the period after the older versions are down and before any newer version is up, the app is down and inccessible to users.
+- Rolling Update (we take down the older version and bring up a newer version one by one). This way, the app never goes down. 
+Rolling update is the default deployment strategy.
+
+# Change deployment Image
+$ k set image DEPLOYMENT nginx-container=nginx:1.9.1
+
+# Deployment Status
+$ kubectl create -f deployment --record
+$ kubectl rollout history deployment
+output:
+Revision    Change_cause
+1           k create --filename=deployment.yaml --record=true
+
+# Rollback
+$ k rollout undo deployment
